@@ -1,3 +1,4 @@
+import { getLastestBlockhash } from "@/utils/blockchain-utils";
 import { MessageType } from "@/utils/messages";
 
 export default defineBackground(async () => {
@@ -16,6 +17,18 @@ export default defineBackground(async () => {
           const txSig = getTxSigFromUrl(url);
           const parsedTx = await getParsedTx(txSig);
           sendResponse(parsedTx);
+        })();
+        break;
+
+      case MessageType.GET_LATEST_BLOCKHASH:
+        (async () => {
+          const blockhash = await handleGetLatestBlockhash();
+          if (!blockhash) {
+            sendResponse(null);
+            return;
+          }
+
+          sendResponse(blockhash);
         })();
         break;
     }
@@ -46,7 +59,9 @@ const getTxSigFromUrl = (url: string) => {
 
 const getParsedTx = async (txSig: string) => {
   const response = await fetch(
-    `https://api.helius.xyz/v0/transactions/?api-key=024b68f3-eac6-43d2-a088-d96e5babfe8a`,
+    `https://api.helius.xyz/v0/transactions/?api-key=${
+      import.meta.env.VITE_HELIUS_API_KEY
+    }`,
     {
       method: "POST",
       body: JSON.stringify({
@@ -57,4 +72,13 @@ const getParsedTx = async (txSig: string) => {
 
   const data = await response.json();
   return data;
+};
+
+export const handleGetLatestBlockhash = async () => {
+  const { data: blockhash, error } = await getLastestBlockhash();
+  if (error || !blockhash) {
+    console.error(error || "Failed to get latest blockhash");
+    return null;
+  }
+  return blockhash;
 };

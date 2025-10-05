@@ -6,6 +6,14 @@ import { MessageType } from "@/utils/messages";
 
 function App() {
   const [parsedTx, setParsedTx] = useState<any>(null);
+  const [blockhash, setBlockhash] = useState<string | null>(null);
+  const getLastestBlockhash = async () => {
+    const response: string | null = await browser.runtime.sendMessage({
+      type: MessageType.GET_LATEST_BLOCKHASH,
+      payload: {},
+    });
+    setBlockhash(response);
+  };
   const getParsedTx = async () => {
     console.log("Getting parsed tx from popup");
     const response = await browser.runtime.sendMessage({
@@ -30,6 +38,11 @@ function App() {
       <div className="card">
         <button onClick={getParsedTx}>get parsed tx</button>
         <p>{JSON.stringify(parsedTx)}</p>
+      </div>
+
+      <div className="card">
+        <button onClick={getLastestBlockhash}>get latest blockhash</button>
+        <p>{JSON.stringify(blockhash)}</p>
       </div>
       <p className="read-the-docs">
         Click on the WXT and React logos to learn more
