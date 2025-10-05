@@ -61,13 +61,16 @@ const ApiKeyDialog = (props: ApiKeyDialogProps) => {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button
-              type="submit"
-              className="bg-green-500 hover:bg-green-600"
-              onClick={onSave}
-            >
-              Save
-            </Button>
+
+            <DialogClose asChild>
+              <Button
+                type="submit"
+                className="bg-green-500 hover:bg-green-600"
+                onClick={onSave}
+              >
+                Save
+              </Button>
+            </DialogClose>
           </DialogFooter>
         </DialogContent>
       </form>

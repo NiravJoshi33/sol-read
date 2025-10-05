@@ -4,10 +4,6 @@ export default () => {
   const [count, setCount] = useState(1);
   const increment = () => setCount((count) => count + 1);
 
-  useEffect(() => {
-    console.log("SolRead content mounted");
-  }, []);
-
   return (
     <div id="solread-content">
       <p style={{ marginBottom: "8px" }}>This is React. {count}</p>
