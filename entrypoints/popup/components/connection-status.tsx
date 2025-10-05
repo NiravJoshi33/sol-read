@@ -15,7 +15,6 @@ const ConnectionStatus = (props: ConnectionStatusProps) => {
     // if connected is false and isLoading is false, show toast
     if (!connected && !isLoading) {
       toast.error("Please add a valid API key", {
-        duration: 3000,
         position: "top-center",
       });
     }
