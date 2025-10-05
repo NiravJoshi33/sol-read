@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import "./App.css";
 import { MessageType } from "@/utils/types/messages";
 import ConnectionStatus from "./components/connection-status";
+import ApiKeyDialog from "./components/api-key-dialog";
 
 function App() {
   const [parsedTx, setParsedTx] = useState<any>(null);
@@ -33,7 +34,7 @@ function App() {
     setConnected(response);
   };
 
-  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [apiKey, setApiKey] = useState<string>("");
   const [showApiKeyForm, setShowApiKeyForm] = useState<boolean>(false);
 
   useEffect(() => {
@@ -55,9 +56,18 @@ function App() {
 
   return (
     <>
-      <div className="flex flex-col items-center justify-center gap-4 w-full">
+      <div className="flex flex-col items-center justify-center gap-4 min-w-64 min-h-128">
         <h1 className="text-6xl font-bold">SolRead</h1>
-        <ConnectionStatus connected={connected} />
+        <div className="flex flex-row gap-4 justify-between w-full items-center">
+          <ConnectionStatus connected={connected} />
+          {!connected && (
+            <ApiKeyDialog
+              apiKey={apiKey || ""}
+              onChange={setApiKey}
+              onSave={handleSetApiKey}
+            />
+          )}
+        </div>
       </div>
     </>
   );
