@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import reactLogo from "@/assets/react.svg";
 import wxtLogo from "/wxt.svg";
 import "./App.css";
-import { MessageType } from "@/utils/messages";
+import { MessageType } from "@/utils/types/messages";
+import ApiKeyForm from "./components/api-key-form";
 
 function App() {
   const [parsedTx, setParsedTx] = useState<any>(null);
   const [blockhash, setBlockhash] = useState<string | null>(null);
+  const [connected, setConnected] = useState<boolean>(false);
   const getLastestBlockhash = async () => {
     const response: string | null = await browser.runtime.sendMessage({
       type: MessageType.GET_LATEST_BLOCKHASH,
@@ -22,6 +24,35 @@ function App() {
     });
     console.log("Response:", response);
     setParsedTx(response);
+  };
+
+  const checkApiKey = async () => {
+    const response = await browser.runtime.sendMessage({
+      type: MessageType.CHECK_API_KEY,
+      payload: {},
+    });
+    console.log("Response:", response);
+    setConnected(response);
+  };
+
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const [showApiKeyForm, setShowApiKeyForm] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (connected) {
+      setShowApiKeyForm(false);
+      return;
+    }
+    checkApiKey();
+    setShowApiKeyForm(true);
+  }, [connected]);
+
+  const handleSetApiKey = () => {
+    // send message to background to set api key
+    browser.runtime.sendMessage({
+      type: MessageType.SET_API_KEY,
+      payload: { apiKey },
+    });
   };
 
   return (
@@ -43,6 +74,18 @@ function App() {
       <div className="card">
         <button onClick={getLastestBlockhash}>get latest blockhash</button>
         <p>{JSON.stringify(blockhash)}</p>
+      </div>
+
+      <div className="card">
+        <button onClick={checkApiKey}>check api key</button>
+        <p>{JSON.stringify(connected)}</p>
+        {showApiKeyForm && (
+          <ApiKeyForm
+            apiKey={apiKey || ""}
+            setApiKey={setApiKey}
+            onSave={handleSetApiKey}
+          />
+        )}
       </div>
       <p className="read-the-docs">
         Click on the WXT and React logos to learn more

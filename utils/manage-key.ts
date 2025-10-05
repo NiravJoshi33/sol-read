@@ -1,7 +1,16 @@
-export const heliusApiKey = import.meta.env.VITE_HELIUS_API_KEY;
-if (!heliusApiKey) {
-  throw new Error("HELIUS_API_KEY is not set");
-  // TODO: get if from user
-}
+const API_KEY_KEY = "userApiKey";
 
-export const testConnection = async () => {};
+export const getApiKey = async (): Promise<string | undefined> => {
+  if (typeof browser === "undefined" || !browser.storage) {
+    return undefined;
+  }
+  const result = await browser.storage.local.get(API_KEY_KEY);
+  return result[API_KEY_KEY];
+};
+
+export const setApiKey = async (apiKey: string): Promise<void> => {
+  if (typeof browser === "undefined" || !browser.storage) {
+    throw new Error("Browser storage is not available");
+  }
+  await browser.storage.local.set({ [API_KEY_KEY]: apiKey });
+};

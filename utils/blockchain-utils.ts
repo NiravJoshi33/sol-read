@@ -4,10 +4,10 @@ import {
   RpcResponseData,
 } from "./types/rpc-response";
 
-export const getLastestBlockhash = async () => {
+export const getLastestBlockhash = async (apiKey: string) => {
   try {
     const response = await fetch(
-      `${envVars.VITE_HELIUS_RPC_URL}?api-key=${envVars.VITE_HELIUS_API_KEY}`,
+      `${envVars.VITE_HELIUS_RPC_URL}?api-key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },

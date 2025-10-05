@@ -1,5 +1,6 @@
 import { getLastestBlockhash } from "@/utils/blockchain-utils";
-import { MessageType } from "@/utils/messages";
+import { MessageType } from "@/utils/types/messages";
+import { getApiKey, setApiKey } from "@/utils/manage-key";
 
 export default defineBackground(async () => {
   console.log("Hello background!", { id: browser.runtime.id });
@@ -8,32 +9,89 @@ export default defineBackground(async () => {
     switch (message.type) {
       case MessageType.GET_PARSED_TX:
         (async () => {
-          const url = await getCurrentTabUrl();
-          if (!url) {
-            sendResponse(null);
-            return;
-          }
+          try {
+            const url = await getCurrentTabUrl();
+            if (!url) {
+              sendResponse(null);
+              return;
+            }
 
-          const txSig = getTxSigFromUrl(url);
-          const parsedTx = await getParsedTx(txSig);
-          sendResponse(parsedTx);
+            const txSig = getTxSigFromUrl(url);
+            const parsedTx = await getParsedTx(txSig);
+            sendResponse(parsedTx);
+          } catch (error) {
+            console.error("Error getting parsed tx:", error);
+            sendResponse(null);
+          }
         })();
-        break;
+        return true;
 
       case MessageType.GET_LATEST_BLOCKHASH:
         (async () => {
-          const blockhash = await handleGetLatestBlockhash();
-          if (!blockhash) {
+          try {
+            const apiKey = await getApiKey();
+            if (!apiKey) {
+              sendResponse(null);
+              return;
+            }
+            const { data: blockhash, error } = await getLastestBlockhash(
+              apiKey
+            );
+            if (error || !blockhash) {
+              sendResponse(null);
+              return;
+            }
+
+            sendResponse(blockhash);
+          } catch (error) {
+            console.error("Error getting latest blockhash:", error);
             sendResponse(null);
-            return;
           }
-
-          sendResponse(blockhash);
         })();
-        break;
-    }
+        return true;
 
-    return true;
+      case MessageType.SET_API_KEY:
+        (async () => {
+          try {
+            await setApiKey(message.payload.apiKey);
+            sendResponse(true);
+          } catch (error) {
+            console.error("Error setting API key:", error);
+            sendResponse(false);
+          }
+        })();
+        return true;
+
+      case MessageType.CHECK_API_KEY:
+        (async () => {
+          try {
+            console.log("Checking API key");
+            const apiKey = await getApiKey();
+            if (!apiKey) {
+              sendResponse(false);
+              return;
+            }
+            const { data: blockhash, error } = await getLastestBlockhash(
+              apiKey
+            );
+            console.log("Blockhash:", blockhash);
+            console.log("Error:", error);
+            if (error || !blockhash) {
+              sendResponse(false);
+              return;
+            }
+            sendResponse(true);
+          } catch (error) {
+            console.error("Error checking API key:", error);
+            sendResponse(false);
+          }
+        })();
+        return true;
+
+      default:
+        sendResponse(null);
+        return false;
+    }
   });
 });
 
@@ -75,7 +133,8 @@ const getParsedTx = async (txSig: string) => {
 };
 
 export const handleGetLatestBlockhash = async () => {
-  const { data: blockhash, error } = await getLastestBlockhash();
+  const apiKey = await getApiKey();
+  const { data: blockhash, error } = await getLastestBlockhash(apiKey || "");
   if (error || !blockhash) {
     console.error(error || "Failed to get latest blockhash");
     return null;
