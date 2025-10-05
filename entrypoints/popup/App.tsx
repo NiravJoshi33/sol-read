@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
-import reactLogo from "@/assets/react.svg";
-import wxtLogo from "/wxt.svg";
 import "./App.css";
 import { MessageType } from "@/utils/types/messages";
-import ApiKeyForm from "./components/api-key-form";
+import ConnectionStatus from "./components/connection-status";
 
 function App() {
   const [parsedTx, setParsedTx] = useState<any>(null);
@@ -57,39 +55,10 @@ function App() {
 
   return (
     <>
-      <div>
-        <a href="https://wxt.dev" target="_blank">
-          <img src={wxtLogo} className="logo" alt="WXT logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="flex flex-col items-center justify-center gap-4 w-full">
+        <h1 className="text-6xl font-bold">SolRead</h1>
+        <ConnectionStatus connected={connected} />
       </div>
-      <h1>WXT + React</h1>
-      <div className="card">
-        <button onClick={getParsedTx}>get parsed tx</button>
-        <p>{JSON.stringify(parsedTx)}</p>
-      </div>
-
-      <div className="card">
-        <button onClick={getLastestBlockhash}>get latest blockhash</button>
-        <p>{JSON.stringify(blockhash)}</p>
-      </div>
-
-      <div className="card">
-        <button onClick={checkApiKey}>check api key</button>
-        <p>{JSON.stringify(connected)}</p>
-        {showApiKeyForm && (
-          <ApiKeyForm
-            apiKey={apiKey || ""}
-            setApiKey={setApiKey}
-            onSave={handleSetApiKey}
-          />
-        )}
-      </div>
-      <p className="read-the-docs">
-        Click on the WXT and React logos to learn more
-      </p>
     </>
   );
 }
