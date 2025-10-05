@@ -1,3 +1,3 @@
-# WXT + React
+# SolRead
 
-This template should help get you started developing with React in WXT.
+A browser extension to get transactions on Solana blockchain parsed into human readable format.
