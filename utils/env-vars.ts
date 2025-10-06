@@ -1,7 +1,6 @@
 import { z } from "zod";
 
 const envVarsSchema = z.object({
-  VITE_HELIUS_API_KEY: z.string().min(1),
   VITE_HELIUS_RPC_URL: z.string().min(1),
 });
 

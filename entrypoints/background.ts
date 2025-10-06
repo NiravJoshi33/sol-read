@@ -13,6 +13,11 @@ export default defineBackground(() => {
       case MessageType.GET_PARSED_TX:
         (async () => {
           try {
+            const apiKey = await getApiKey();
+            if (!apiKey) {
+              sendResponse({ data: null, error: "No API key found" });
+              return;
+            }
             const url = await getCurrentTabUrl();
             if (!url) {
               sendResponse({ data: null, error: "No URL found" });
@@ -28,7 +33,14 @@ export default defineBackground(() => {
               });
               return;
             }
-            const parsedTx = await getParsedTx(txSig);
+            const parsedTx = await getParsedTx(txSig, apiKey);
+            if (!parsedTx) {
+              sendResponse({
+                data: null,
+                error: "Failed to get parsed tx",
+              });
+              return;
+            }
             sendResponse({ data: parsedTx, error: null });
           } catch (error) {
             console.error("Error getting parsed tx:", error);
@@ -128,11 +140,9 @@ const getTxSigFromUrl = (url: string) => {
   return sig;
 };
 
-const getParsedTx = async (txSig: string) => {
+const getParsedTx = async (txSig: string, apiKey: string) => {
   const response = await fetch(
-    `https://api.helius.xyz/v0/transactions/?api-key=${
-      import.meta.env.VITE_HELIUS_API_KEY
-    }`,
+    `https://api.helius.xyz/v0/transactions/?api-key=${apiKey}`,
     {
       method: "POST",
       body: JSON.stringify({
