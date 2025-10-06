@@ -63,24 +63,24 @@ const TransactionCard = ({ txData }: { txData: FormattedTx }) => {
   const Icon = getTransactionIcon(txData.type);
 
   return (
-    <Card className="w-full max-w-2xl mx-auto shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg">
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-white/20 rounded-lg backdrop-blur-sm">
-            <Icon className="h-6 w-6" />
+    <Card className="w-full shadow-lg overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-t-lg py-2">
+        <div className="flex items-center justify-center gap-2">
+          <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm flex-shrink-0">
+            <Icon className="h-5 w-5" />
           </div>
-          <div className="flex-1 min-w-0">
-            <CardTitle className="text-xl mb-1">
+          <div className="flex-1 min-w-0 break-words max-w-[280px]">
+            <CardTitle className="text-base mb-1 break-words text-wrap whitespace-normal leading-tight">
               {txData.description || "Solana Transaction"}
             </CardTitle>
-            <CardDescription className="text-purple-100">
+            <CardDescription className="text-purple-100 text-sm">
               {formatTime(txData.timestamp)}
             </CardDescription>
           </div>
           {txData.source && (
             <Badge
               variant="secondary"
-              className="bg-white/20 text-white border-white/30"
+              className="bg-white/20 text-white border-white/30 flex-shrink-0 whitespace-nowrap text-xs"
             >
               {txData.source}
             </Badge>

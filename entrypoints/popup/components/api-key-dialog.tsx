@@ -25,7 +25,10 @@ const ApiKeyDialog = (props: ApiKeyDialogProps) => {
     <Dialog>
       <form>
         <DialogTrigger asChild>
-          <Button variant="outline" className="bg-green-500 hover:bg-green-600">
+          <Button
+            variant="outline"
+            className="bg-green-500 hover:bg-green-600 w-full"
+          >
             Add API Key
           </Button>
         </DialogTrigger>

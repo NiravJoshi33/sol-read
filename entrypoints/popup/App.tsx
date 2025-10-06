@@ -25,6 +25,19 @@ function App() {
     checkConnection();
   }, []);
 
+  useEffect(() => {
+    if (isLoadingFormattedTx) {
+      toast.dismiss();
+      toast.loading("Loading transaction...");
+    } else if (errorFormattedTx) {
+      toast.dismiss();
+      toast.error(errorFormattedTx);
+    } else if (formattedTx) {
+      toast.dismiss();
+      toast.success("Transaction loaded successfully");
+    }
+  }, [isLoadingFormattedTx, errorFormattedTx, formattedTx]);
+
   const handleSetApiKey = () => {
     // send message to background to set api key
     browser.runtime.sendMessage({
@@ -40,9 +53,9 @@ function App() {
   return (
     <>
       <Toaster />
-      <div className="flex flex-col items-center justify-center gap-4 min-w-64 min-h-128">
+      <div className="flex flex-col items-center justify-center gap-4 w-full min-h-128 px-2">
         <h1 className="text-6xl font-bold">SolRead</h1>
-        <div className="flex flex-row gap-4 justify-between w-full items-center">
+        <div className="flex flex-row gap-4 justify-center w-full items-center">
           <ConnectionStatus connected={connected} isLoading={isLoading} />
           {!connected && !isLoading && (
             <ApiKeyDialog

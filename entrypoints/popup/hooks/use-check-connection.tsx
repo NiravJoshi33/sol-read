@@ -11,12 +11,17 @@ const useCheckConnection = () => {
     setIsLoading(true);
 
     setError(null);
-    const response = await browser.runtime.sendMessage({
+    const { data, error } = await browser.runtime.sendMessage({
       type: MessageType.CHECK_API_KEY,
       payload: {},
     });
-    console.log("Response:", response);
-    setConnected(response);
+    if (error) {
+      setError(error);
+      setConnected(false);
+      setIsLoading(false);
+      return;
+    }
+    setConnected(data);
     setIsLoading(false);
   };
 

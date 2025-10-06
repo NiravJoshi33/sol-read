@@ -21,7 +21,7 @@ const ConnectionStatus = (props: ConnectionStatusProps) => {
   }, [connected, isLoading]);
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-full gap-2">
+    <div className="flex flex-col items-center justify-center h-full gap-2">
       <Badge
         className="flex flex-row items-center justify-center h-full gap-2"
         variant={connected || isLoading ? "secondary" : "destructive"}

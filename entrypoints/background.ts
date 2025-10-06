@@ -15,16 +15,24 @@ export default defineBackground(() => {
           try {
             const url = await getCurrentTabUrl();
             if (!url) {
-              sendResponse(null);
+              sendResponse({ data: null, error: "No URL found" });
               return;
             }
 
             const txSig = getTxSigFromUrl(url);
+            if (!txSig) {
+              sendResponse({
+                data: null,
+                error:
+                  "No Transfer Signature found, Please make sure you are on a Solana transaction page",
+              });
+              return;
+            }
             const parsedTx = await getParsedTx(txSig);
-            sendResponse(parsedTx);
+            sendResponse({ data: parsedTx, error: null });
           } catch (error) {
             console.error("Error getting parsed tx:", error);
-            sendResponse(null);
+            sendResponse({ data: null, error: error as string });
           }
         })();
         return true;
@@ -34,21 +42,21 @@ export default defineBackground(() => {
           try {
             const apiKey = await getApiKey();
             if (!apiKey) {
-              sendResponse(null);
+              sendResponse({ data: null, error: "No API key found" });
               return;
             }
             const { data: blockhash, error } = await getLastestBlockhash(
               apiKey
             );
             if (error || !blockhash) {
-              sendResponse(null);
+              sendResponse({ data: null, error: error });
               return;
             }
 
-            sendResponse(blockhash);
+            sendResponse({ data: blockhash, error: null });
           } catch (error) {
             console.error("Error getting latest blockhash:", error);
-            sendResponse(null);
+            sendResponse({ data: null, error: error as string });
           }
         })();
         return true;
@@ -57,10 +65,10 @@ export default defineBackground(() => {
         (async () => {
           try {
             await setApiKey(message.payload.apiKey);
-            sendResponse(true);
+            sendResponse({ data: true, error: null });
           } catch (error) {
             console.error("Error setting API key:", error);
-            sendResponse(false);
+            sendResponse({ data: false, error: error as string });
           }
         })();
         return true;
@@ -72,7 +80,7 @@ export default defineBackground(() => {
             const apiKey = await getApiKey();
             if (!apiKey) {
               console.log("No API key found");
-              sendResponse(false);
+              sendResponse({ data: false, error: "No API key found" });
               return;
             }
             const { data: blockhash, error } = await getLastestBlockhash(
@@ -82,19 +90,19 @@ export default defineBackground(() => {
             console.log("Error:", error);
             if (error || !blockhash) {
               console.log("Error getting latest blockhash");
-              sendResponse(false);
+              sendResponse({ data: false, error: error });
               return;
             }
-            sendResponse(true);
+            sendResponse({ data: true, error: null });
           } catch (error) {
             console.error("Error checking API key:", error);
-            sendResponse(false);
+            sendResponse({ data: false, error: error as string });
           }
         })();
         return true;
 
       default:
-        sendResponse(null);
+        sendResponse({ data: null, error: "Invalid message type" });
         return false;
     }
   });

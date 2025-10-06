@@ -12,13 +12,25 @@ const useGetParsedTransaction = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const response: GetEnhancedTransactionsResponse | null =
-        await browser.runtime.sendMessage({
-          type: MessageType.GET_PARSED_TX,
-          payload: {},
-        });
+      const {
+        data,
+        error,
+      }: {
+        data: GetEnhancedTransactionsResponse | null;
+        error: string | Error | null;
+      } = await browser.runtime.sendMessage({
+        type: MessageType.GET_PARSED_TX,
+        payload: {},
+      });
 
-      setFormattedTx(TransactionParser.parseTx(response));
+      if (error) {
+        setError(error as string);
+        setFormattedTx(null);
+        setIsLoading(false);
+        return;
+      }
+
+      setFormattedTx(TransactionParser.parseTx(data));
     } catch (error) {
       setError(error as string);
     }

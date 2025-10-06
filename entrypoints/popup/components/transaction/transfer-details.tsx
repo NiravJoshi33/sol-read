@@ -14,6 +14,7 @@ import {
   Copy,
 } from "lucide-react";
 import useCopyAddress from "../../hooks/use-copy-address";
+import { useState } from "react";
 
 const TransferDetails = ({ txData }: { txData: FormattedTx }) => {
   const [expanded, setExpanded] = useState(false);

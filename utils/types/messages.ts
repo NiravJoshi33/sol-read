@@ -9,3 +9,8 @@ export interface Message<T> {
   type: MessageType;
   payload: T;
 }
+
+export interface MessageResponse<T> {
+  data: T;
+  error: string | Error | null;
+}
