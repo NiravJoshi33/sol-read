@@ -19,7 +19,7 @@ export default defineContentScript({
         container.append(solreadContentWrapper);
 
         const root = ReactDOM.createRoot(solreadContentWrapper);
-        root.render(<App />);
+        // root.render(<App />);
         return { root, solreadContentWrapper };
       },
       onRemove: (elements) => {
