@@ -1,11 +1,14 @@
 import { getLastestBlockhash } from "@/utils/blockchain-utils";
 import { MessageType } from "@/utils/types/messages";
 import { getApiKey, setApiKey } from "@/utils/manage-key";
+import { GetEnhancedTransactionsResponse } from "@/utils/types/helius";
+import { RpcResponseData } from "@/utils/types/rpc-response";
 
-export default defineBackground(async () => {
+export default defineBackground(() => {
   console.log("Hello background!", { id: browser.runtime.id });
 
   browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log("Message received:", message);
     switch (message.type) {
       case MessageType.GET_PARSED_TX:
         (async () => {
@@ -68,6 +71,7 @@ export default defineBackground(async () => {
             console.log("Checking API key");
             const apiKey = await getApiKey();
             if (!apiKey) {
+              console.log("No API key found");
               sendResponse(false);
               return;
             }
@@ -77,6 +81,7 @@ export default defineBackground(async () => {
             console.log("Blockhash:", blockhash);
             console.log("Error:", error);
             if (error || !blockhash) {
+              console.log("Error getting latest blockhash");
               sendResponse(false);
               return;
             }
@@ -128,8 +133,14 @@ const getParsedTx = async (txSig: string) => {
     }
   );
 
-  const data = await response.json();
-  return data;
+  const data: GetEnhancedTransactionsResponse | RpcResponseData<null> =
+    await response.json();
+
+  if (Array.isArray(data)) {
+    return data;
+  } else {
+    return null;
+  }
 };
 
 export const handleGetLatestBlockhash = async () => {

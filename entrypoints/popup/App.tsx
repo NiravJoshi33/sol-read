@@ -5,21 +5,25 @@ import ConnectionStatus from "./components/connection-status";
 import ApiKeyDialog from "./components/api-key-dialog";
 import useCheckConnection from "./hooks/use-check-connection";
 import { toast, Toaster } from "sonner";
+import TransactionCard from "./components/transaction/tx-card";
+import { Button } from "@/components/ui/button";
+import useGetParsedTransaction from "./hooks/use-get-parsed-tx";
+import { Download, Loader2 } from "lucide-react";
 
 function App() {
   const { connected, isLoading, error, checkConnection } = useCheckConnection();
+  const {
+    formattedTx,
+    isLoading: isLoadingFormattedTx,
+    error: errorFormattedTx,
+    getParsedTransaction,
+  } = useGetParsedTransaction();
 
   const [apiKey, setApiKey] = useState<string>("");
-  const [showApiKeyForm, setShowApiKeyForm] = useState<boolean>(false);
 
   useEffect(() => {
-    if (connected) {
-      setShowApiKeyForm(false);
-      return;
-    }
     checkConnection();
-    setShowApiKeyForm(true);
-  }, [connected]);
+  }, []);
 
   const handleSetApiKey = () => {
     // send message to background to set api key
@@ -48,6 +52,25 @@ function App() {
             />
           )}
         </div>
+
+        {formattedTx ? (
+          <TransactionCard txData={formattedTx} />
+        ) : (
+          <div>
+            <Button
+              onClick={() => getParsedTransaction()}
+              className="w-full"
+              disabled={isLoadingFormattedTx || isLoading}
+            >
+              {isLoadingFormattedTx ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Download />
+              )}
+              {isLoadingFormattedTx ? "Loading..." : "Get Transaction"}
+            </Button>
+          </div>
+        )}
       </div>
     </>
   );

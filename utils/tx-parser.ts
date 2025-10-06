@@ -1,14 +1,54 @@
 import {
+  AccountData,
   CompressedEvent,
   EnhancedTransaction,
+  Events,
   GetEnhancedTransactionsResponse,
+  NativeTransfer,
   NFTEvent,
   SwapEvent,
+  TokenTransfer,
+  TransactionError,
 } from "@/utils/types/helius";
 import { knownTokens } from "@/utils/known-tokens";
 
-class TransactionParser {
-  static parseTx(response: GetEnhancedTransactionsResponse) {
+export interface FormattedTx {
+  signature: string;
+  timestamp: number;
+  slot?: number;
+  fee?: number;
+  feePayer?: string;
+  description: string;
+  type: string;
+  source?: string;
+  nativeTransfers?: NativeTransfer[];
+  tokenTransfers?: TokenTransfer[];
+  events?: Events;
+  accounData?: AccountData[];
+  transactionError?: TransactionError | null;
+  success: boolean;
+  uiConfig: {
+    iconType: string;
+    colorScheme: string;
+    actionSummary: {
+      action: string;
+      from?: string;
+      fromToken?: string;
+      to?: string;
+      toToken?: string;
+      amount?: string;
+      currency?: string;
+    };
+    keyStats: { label: string; value: string; unit?: string }[];
+    isComplex: boolean;
+    participants: string[];
+  };
+}
+
+export class TransactionParser {
+  static parseTx(
+    response: GetEnhancedTransactionsResponse | null
+  ): FormattedTx {
     if (!response || response.length === 0) {
       return this.createUnknownTx();
     }
@@ -133,19 +173,19 @@ class TransactionParser {
           toToken: this.getTokenSymbol(output.mint),
         };
       }
-
-      if (tx.events?.nft) {
-        return {
-          action: tx.events.nft.type,
-          amount: tx.events.nft.amount
-            ? this.formatAmount(tx.events.nft.amount.toString(), 9)
-            : null,
-          currency: "SOL",
-        };
-      }
-
-      return { action: "UNKNOWN" };
     }
+
+    if (tx.events?.nft) {
+      return {
+        action: tx.events.nft.type,
+        amount: tx.events.nft.amount
+          ? this.formatAmount(tx.events.nft.amount.toString(), 9)
+          : undefined,
+        currency: "SOL",
+      };
+    }
+
+    return { action: "UNKNOWN" };
   }
 
   static extractKeyStats(tx: EnhancedTransaction) {
@@ -259,6 +299,9 @@ class TransactionParser {
         iconType: "unknown",
         colorScheme: "gray",
         actionSummary: { action: "UNKNOWN" },
+        keyStats: [],
+        isComplex: false,
+        participants: [],
       },
     };
   }

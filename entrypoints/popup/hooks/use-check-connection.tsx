@@ -7,15 +7,15 @@ const useCheckConnection = () => {
   const [error, setError] = useState<string | null>(null);
 
   const checkConnection = async () => {
-    // add delay
+    console.log("Checking connection");
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     setError(null);
     const response = await browser.runtime.sendMessage({
       type: MessageType.CHECK_API_KEY,
       payload: {},
     });
+    console.log("Response:", response);
     setConnected(response);
     setIsLoading(false);
   };
