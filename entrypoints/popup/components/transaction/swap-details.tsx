@@ -24,6 +24,7 @@ const SwapDetails = ({ swap }: { swap: SwapEvent }) => {
     : "0";
 
   const inputMint = tokenInput?.mint || null;
+  const inputAccount = tokenInput?.userAccount || nativeInput?.account || "";
 
   // Format output
   const outputAmount = tokenOutput
@@ -36,6 +37,7 @@ const SwapDetails = ({ swap }: { swap: SwapEvent }) => {
     : "0";
 
   const outputMint = tokenOutput?.mint || null;
+  const outputAccount = tokenOutput?.userAccount || nativeOutput?.account || "";
 
   return (
     <div className="space-y-4">
@@ -43,7 +45,7 @@ const SwapDetails = ({ swap }: { swap: SwapEvent }) => {
         <Card className="bg-red-50 border-red-200">
           <CardContent className="pt-6">
             <div className="text-xs text-red-600 font-medium mb-2">
-              You Paid
+              Paid ({formatAddress(inputAccount)})
             </div>
             <div className="text-2xl font-bold text-red-900">{inputAmount}</div>
             <div className="text-sm text-red-600 mt-1">
@@ -59,7 +61,7 @@ const SwapDetails = ({ swap }: { swap: SwapEvent }) => {
         <Card className="bg-green-50 border-green-200">
           <CardContent className="pt-6">
             <div className="text-xs text-green-600 font-medium mb-2">
-              You Received
+              Received ({formatAddress(outputAccount)})
             </div>
             <div className="text-2xl font-bold text-green-900">
               {outputAmount}
